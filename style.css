@@ -42,6 +42,22 @@ p {
     margin: 0 auto;
   }
 
+#Contact {
+    text-align: center;
+}
+
+#insta {
+    display: block;
+    width: fit-content;
+    margin: 20px auto;
+}
+
+#link {
+    display: block;
+    width: fit-content;
+    margin: 20px auto;
+}
+
 #main {
     color: red;
     background-color: beige;
