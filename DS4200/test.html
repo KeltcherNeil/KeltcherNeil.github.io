@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>991 GT3 Price Predictor</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', sans-serif; background: #0e0e0e; color: #f0f0f0; min-height: 100vh; }
+
+  .hero {
+    width: 100%; height: 220px;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 40%, #0f3460 100%);
+    display: flex; align-items: center; justify-content: center;
+    position: relative; overflow: hidden;
+  }
+  .hero::before {
+    content: ''; position: absolute; inset: 0;
+    background: repeating-linear-gradient(45deg, transparent, transparent 40px, rgba(255,255,255,.02) 40px, rgba(255,255,255,.02) 80px);
+  }
+  .hero-text { text-align: center; z-index: 1; }
+  .hero-text h1 { font-size: 2rem; font-weight: 700; letter-spacing: 2px; color: #fff; }
+  .hero-text span { color: #e8b400; }
+  .hero-icon { font-size: 3rem; display: block; margin-bottom: 8px; }
+
+  hr { border: none; border-top: 1px solid #2a2a2a; margin: 0 24px; }
+
+  .container { max-width: 900px; margin: 0 auto; padding: 24px; }
+
+  .grid { display: grid; grid-template-columns: 2fr 1fr; gap: 24px; margin-top: 8px; }
+  @media (max-width: 600px) { .grid { grid-template-columns: 1fr; } }
+
+  .card { background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 12px; padding: 20px; }
+  .card h2 { font-size: 1rem; margin-bottom: 16px; color: #aaa; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid #2a2a2a; padding-bottom: 10px; }
+
+  .field { margin-bottom: 18px; }
+  label { display: block; font-size: 0.85rem; color: #bbb; margin-bottom: 6px; }
+
+  input[type=range] { width: 100%; accent-color: #e8b400; }
+  .range-val { font-size: 0.9rem; color: #e8b400; font-weight: 600; margin-top: 4px; }
+
+  select { width: 100%; background: #252525; border: 1px solid #333; color: #f0f0f0; padding: 8px 10px; border-radius: 6px; font-size: 0.9rem; }
+
+  .radio-group { display: flex; flex-direction: column; gap: 6px; }
+  .radio-group label { display: flex; align-items: center; gap: 8px; font-size: 0.9rem; color: #ddd; cursor: pointer; }
+  .radio-group input[type=radio] { accent-color: #e8b400; width: 15px; height: 15px; }
+
+  .check-group { display: flex; flex-direction: column; gap: 10px; }
+  .check-group label { display: flex; align-items: center; gap: 8px; font-size: 0.9rem; color: #ddd; cursor: pointer; }
+  .check-group input[type=checkbox] { accent-color: #e8b400; width: 15px; height: 15px; flex-shrink: 0; }
+
+  .btn-row { margin-top: 24px; text-align: center; }
+  button#calcBtn {
+    background: #e8b400; color: #000; border: none; padding: 14px 40px;
+    font-size: 1rem; font-weight: 700; border-radius: 8px; cursor: pointer;
+    letter-spacing: 1px; transition: background .2s, transform .1s;
+  }
+  button#calcBtn:hover { background: #ffd000; }
+  button#calcBtn:active { transform: scale(.97); }
+  button#calcBtn:disabled { background: #555; color: #888; cursor: not-allowed; }
+
+  #result { margin-top: 24px; }
+  .result-box {
+    background: #1a2e1a; border: 1px solid #2d5a2d; border-radius: 10px;
+    padding: 20px; text-align: center;
+  }
+  .result-box .price { font-size: 2rem; font-weight: 800; color: #4caf50; margin-top: 4px; }
+  .result-box .label { font-size: 0.85rem; color: #aaa; text-transform: uppercase; letter-spacing: 1px; }
+
+  .loader { text-align: center; color: #aaa; font-size: 0.9rem; padding: 20px; }
+  .spinner { display: inline-block; width: 20px; height: 20px; border: 2px solid #333; border-top-color: #e8b400; border-radius: 50%; animation: spin .7s linear infinite; vertical-align: middle; margin-right: 8px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .error-box { background: #2e1a1a; border: 1px solid #5a2d2d; border-radius: 10px; padding: 16px; color: #f88; font-size: 0.9rem; }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-text">
+    <span class="hero-icon">🏎️</span>
+    <h1>991 GT3 <span>Price Predictor</span></h1>
+  </div>
+</div>
+
+<hr>
+
+<div class="container">
+  <div class="grid">
+
+    <!-- Left: Basic Info -->
+    <div class="card">
+      <h2>📊 Basic Information</h2>
+
+      <div class="field">
+        <label for="miles">Mileage</label>
+        <input type="range" id="miles" min="0" max="75000" step="500" value="0" oninput="document.getElementById('milesVal').textContent = Number(this.value).toLocaleString() + ' mi'">
+        <div class="range-val" id="milesVal">0 mi</div>
+      </div>
+
+      <div class="field">
+        <label for="year">Model Year</label>
+        <select id="year">
+          <option>2014</option>
+          <option>2015</option>
+          <option>2016</option>
+          <option>2018</option>
+          <option>2019</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Trim Level</label>
+        <div class="radio-group">
+          <label><input type="radio" name="trim" value="Base" checked> Base</label>
+          <label><input type="radio" name="trim" value="RS"> RS</label>
+          <label><input type="radio" name="trim" value="RS Weissach"> RS Weissach</label>
+          <label><input type="radio" name="trim" value="Touring"> Touring</label>
+        </div>
+      </div>
+
+      <div class="field">
+        <div class="check-group">
+          <label><input type="checkbox" id="trans"> Manual Transmission</label>
+          <label><input type="checkbox" id="pts"> Paint to Sample</label>
+          <label><input type="checkbox" id="carfax"> Clean Carfax Report</label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: Performance Options -->
+    <div class="card">
+      <h2>⚙️ Performance Options</h2>
+      <div class="check-group">
+        <label><input type="checkbox" id="ceramic"> Carbon Ceramic Brakes (PCCB)</label>
+        <label><input type="checkbox" id="bucket"> Carbon Fiber Bucket Seats</label>
+        <label><input type="checkbox" id="chrono"> Sport Chrono Package</label>
+        <label><input type="checkbox" id="lift"> Front Axle Lift System</label>
+        <label><input type="checkbox" id="pasm"> PASM Suspension</label>
+        <label><input type="checkbox" id="torque"> Rear Axle Steering / Torque Vectoring</label>
+      </div>
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <button id="calcBtn" onclick="predict()">🏁 Calculate Value</button>
+  </div>
+
+  <div id="result"></div>
+</div>
+
+<script>
+async function predict() {
+  const btn = document.getElementById('calcBtn');
+  const resultEl = document.getElementById('result');
+
+  const miles   = document.getElementById('miles').value;
+  const year    = document.getElementById('year').value;
+  const trim    = document.querySelector('input[name=trim]:checked').value;
+  const trans   = document.getElementById('trans').checked;
+  const pts     = document.getElementById('pts').checked;
+  const carfax  = document.getElementById('carfax').checked;
+  const ceramic = document.getElementById('ceramic').checked;
+  const bucket  = document.getElementById('bucket').checked;
+  const chrono  = document.getElementById('chrono').checked;
+  const lift    = document.getElementById('lift').checked;
+  const pasm    = document.getElementById('pasm').checked;
+  const torque  = document.getElementById('torque').checked;
+
+  btn.disabled = true;
+  resultEl.innerHTML = `<div class="loader"><span class="spinner"></span>Crunching numbers…</div>`;
+
+  const prompt = `You are an expert Porsche 991 GT3 market analyst with deep knowledge of used car valuations.
+Estimate the current fair market value for a used Porsche 991 GT3 with these specs:
+- Year: ${year}
+- Trim: ${trim}
+- Mileage: ${Number(miles).toLocaleString()} miles
+- Manual Transmission: ${trans ? 'Yes' : 'No (PDK)'}
+- Paint to Sample: ${pts ? 'Yes' : 'No'}
+- Clean Carfax: ${carfax ? 'Yes' : 'No'}
+- PCCB (Carbon Ceramic Brakes): ${ceramic ? 'Yes' : 'No'}
+- Carbon Bucket Seats: ${bucket ? 'Yes' : 'No'}
+- Sport Chrono Package: ${chrono ? 'Yes' : 'No'}
+- Front Axle Lift System: ${lift ? 'Yes' : 'No'}
+- PASM Suspension: ${pasm ? 'Yes' : 'No'}
+- Rear Axle Steering / Torque Vectoring: ${torque ? 'Yes' : 'No'}
+
+Respond ONLY with a JSON object in this exact format, no markdown or extra text:
+{"price": 175000, "low": 168000, "high": 182000, "note": "One sentence explanation."}`;
+
+  try {
+    const res = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 200,
+        messages: [{ role: "user", content: prompt }]
+      })
+    });
+
+    const data = await res.json();
+    const text = data.content.map(b => b.text || '').join('').replace(/```json|```/g, '').trim();
+    const parsed = JSON.parse(text);
+
+    resultEl.innerHTML = `
+      <div class="result-box">
+        <div class="label">Estimated Market Value</div>
+        <div class="price">$${Number(parsed.price).toLocaleString()}</div>
+        <div style="color:#888; font-size:.85rem; margin-top:8px;">
+          Range: $${Number(parsed.low).toLocaleString()} – $${Number(parsed.high).toLocaleString()}
+        </div>
+        <div style="color:#bbb; font-size:.85rem; margin-top:10px; font-style:italic;">${parsed.note}</div>
+      </div>`;
+  } catch(e) {
+    resultEl.innerHTML = `<div class="error-box">⚠️ Could not retrieve estimate. Please try again.</div>`;
+  }
+
+  btn.disabled = false;
+}
+</script>
+</body>
+</html>
